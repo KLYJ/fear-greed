@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>글로벌 공포·탐욕 지수 대시보드</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .chart-container { width: 100%; height: 260px; }
+    </style>
+</head>
+<body class="p-4 md:p-8 font-sans">
+    <div class="max-w-6xl mx-auto">
+        <!-- 대시보드 헤더 -->
+        <header class="mb-8 text-center">
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-2">Fear & Greed Index</h1>
+            <p class="text-sm text-slate-400">시장별 심리 지표 및 투자 포지션 대응 가이드</p>
+            <div id="current-clock" class="inline-block mt-3 px-3 py-1 bg-slate-800 rounded-full text-xs text-slate-300 border border-slate-700">
+                조회 일시: 계산 중...
+            </div>
+        </header>
+
+        <!-- 3개 시장 카드 그리드 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- 1. 암호화폐 (Crypto) -->
+            <div class="bg-slate-800/80 backdrop-blur rounded-2xl p-5 border border-slate-700/60 shadow-lg flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
+                        <h2 class="text-lg font-bold text-white">암호화폐 (Crypto)</h2>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">출처: Alternative.me</span>
+                    </div>
+                    <div id="crypto-gauge" class="chart-container"></div>
+                    <div class="text-center -mt-4 mb-4">
+                        <span id="crypto-text" class="text-xl font-bold tracking-wide">-</span>
+                    </div>
+                </div>
+                <!-- 행동 가이드 박스 -->
+                <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-700/80">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-slate-400 font-medium">대응 전략</span>
+                        <span id="crypto-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span>
+                    </div>
+                    <p id="crypto-desc" class="text-xs text-slate-300 leading-relaxed mb-3">-</p>
+                    <p class="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
+                        <span>데이터 갱신:</span>
+                        <span id="crypto-time" class="text-slate-300">-</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2. 미국 증시 (US) -->
+            <div class="bg-slate-800/80 backdrop-blur rounded-2xl p-5 border border-slate-700/60 shadow-lg flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
+                        <h2 class="text-lg font-bold text-white">미국 증시 (US)</h2>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">출처: CNN Business</span>
+                    </div>
+                    <div id="us-gauge" class="chart-container"></div>
+                    <div class="text-center -mt-4 mb-4">
+                        <span id="us-text" class="text-xl font-bold tracking-wide">-</span>
+                    </div>
+                </div>
+                <!-- 행동 가이드 박스 -->
+                <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-700/80">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-slate-400 font-medium">대응 전략</span>
+                        <span id="us-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span>
+                    </div>
+                    <p id="us-desc" class="text-xs text-slate-300 leading-relaxed mb-3">-</p>
+                    <p class="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
+                        <span>데이터 갱신:</span>
+                        <span id="us-time" class="text-slate-300">-</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- 3. 한국 증시 (KOR) -->
+            <div class="bg-slate-800/80 backdrop-blur rounded-2xl p-5 border border-slate-700/60 shadow-lg flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
+                        <h2 class="text-lg font-bold text-white">한국 증시 (KOR)</h2>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">출처: KRX (VKOSPI 역산)</span>
+                    </div>
+                    <div id="kr-gauge" class="chart-container"></div>
+                    <div class="text-center -mt-4 mb-4">
+                        <span id="kr-text" class="text-xl font-bold tracking-wide">-</span>
+                    </div>
+                </div>
+                <!-- 행동 가이드 박스 -->
+                <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-700/80">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-slate-400 font-medium">대응 전략</span>
+                        <span id="kr-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span>
+                    </div>
+                    <p id="kr-desc" class="text-xs text-slate-300 leading-relaxed mb-3">-</p>
+                    <p class="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
+                        <span>데이터 갱신:</span>
+                        <span id="kr-time" class="text-slate-300">-</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center text-xs text-slate-400 mt-8">
+            * 공포·탐욕 지수는 단독 매매 신호가 아니며, 추세 전환 파악 및 분할 매매 비중 결정을 위한 참고용 보조지표입니다.
+        </p>
+    </div>
+
+    <script>
+        // 1. 현재 접속 시간 실시간 갱신
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleString('ko-KR', { 
+                year: 'numeric', month: '2-digit', day: '2-digit', 
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
+            });
+            document.getElementById('current-clock').innerText = `현재 조회 일시: ${timeStr} KST`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 2. 점수별 행동 가이드 산출 함수
+        function getActionStrategy(value) {
+            if (value <= 25) {
+                return {
+                    state: 'Extreme Fear (극단적 공포)',
+                    badge: '적극 분할 매수 고려',
+                    badgeColor: 'bg-emerald-950 text-emerald-400 border border-emerald-800',
+                    mainColor: '#10b981',
+                    desc: '과매도 국면입니다. 패닉 셀에 동참하기보다 우량 자산을 중심으로 분할 매수를 검토하기 유리한 구간입니다.'
+                };
+            } else if (value <= 45) {
+                return {
+                    state: 'Fear (공포)',
+                    badge: '관망 및 저점 분할 매수',
+                    badgeColor: 'bg-teal-950 text-teal-400 border border-teal-800',
+                    mainColor: '#14b8a6',
+                    desc: '시장 침체 국면입니다. 무리한 진입보다는 관심 종목의 지지선을 확인하며 보수적으로 분할 매수할 타이밍입니다.'
+                };
+            } else if (value <= 55) {
+                return {
+                    state: 'Neutral (중립)',
+                    badge: '보유 (Hold) 및 방향성 관망',
+                    badgeColor: 'bg-amber-950 text-amber-400 border border-amber-800',
+                    mainColor: '#f59e0b',
+                    desc: '매수세와 매도세가 팽팽합니다. 기존 보유 포지션을 유지하며 다음 변동성 방향을 확인하는 것이 권장됩니다.'
+                };
+            } else if (value <= 75) {
+                return {
+                    state: 'Greed (탐욕)',
+                    badge: '보유 (Hold) & 분할 차익실현',
+                    badgeColor: 'bg-orange-950 text-orange-400 border border-orange-800',
+                    mainColor: '#f97316',
+                    desc: '낙관론이 우세합니다. 신규 추격 매수는 자제하고, 기존 보유 물량을 지키며 일정 비율 분할 익절을 고려할 구간입니다.'
+                };
+            } else {
+                return {
+                    state: 'Extreme Greed (극단적 탐욕)',
+                    badge: '분할 매도 및 현금 확보',
+                    badgeColor: 'bg-rose-950 text-rose-400 border border-rose-800',
+                    mainColor: '#f43f5e',
+                    desc: '단기 과열 국면입니다. 하락 조정에 취약하므로 적극적인 분할 매도로 차익을 실현하고 현금 비중을 높이는 것이 안전합니다.'
+                };
+            }
+        }
+
+        // 3. ECharts 게이지 옵션 생성 함수
+        function getGaugeOption(value, color) {
+            return {
+                series: [{
+                    type: 'gauge',
+                    startAngle: 190,
+                    endAngle: -10,
+                    min: 0,
+                    max: 100,
+                    itemStyle: { color: color },
+                    progress: { show: true, width: 22, roundCap: true },
+                    pointer: { show: false },
+                    axisLine: { lineStyle: { width: 22, color: [[1, '#1e293b']] } },
+                    axisTick: { show: false },
+                    splitLine: { show: false },
+                    axisLabel: { show: false },
+                    detail: {
+                        valueAnimation: true,
+                        offsetCenter: [0, '-10%'],
+                        fontSize: 44,
+                        fontWeight: 'bold',
+                        color: '#f8fafc',
+                        formatter: '{value}'
+                    },
+                    data: [{ value: value }]
+                }]
+            };
+        }
+
+        // 차트 초기화
+        const cryptoChart = echarts.init(document.getElementById('crypto-gauge'));
+        const usChart = echarts.init(document.getElementById('us-gauge'));
+        const krChart = echarts.init(document.getElementById('kr-gauge'));
+
+        // 암호화폐 데이터 연동 (Alternative.me API)
+        fetch('https://api.alternative.me/fng/')
+            .then(res => res.json())
+            .then(data => {
+                const item = data.data[0];
+                const value = parseInt(item.value);
+                const info = getActionStrategy(value);
+
+                // 게이지 및 텍스트 적용
+                cryptoChart.setOption(getGaugeOption(value, info.mainColor));
+                const textEl = document.getElementById('crypto-text');
+                textEl.innerText = `${item.value_classification} (${value})`;
+                textEl.style.color = info.mainColor;
+
+                // 대응 전략 뱃지 및 설명
+                const badgeEl = document.getElementById('crypto-badge');
+                badgeEl.innerText = info.badge;
+                badgeEl.className = `text-xs font-bold px-2 py-0.5 rounded ${info.badgeColor}`;
+                document.getElementById('crypto-desc').innerText = info.desc;
+
+                // API 수집 일시 (UNIX 타임스탬프 변환)
+                const apiDate = new Date(parseInt(item.timestamp) * 1000);
+                document.getElementById('crypto-time').innerText = apiDate.toLocaleString('ko-KR', {
+                    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
+                });
+            })
+            .catch(err => {
+                console.error("암호화폐 API 오류:", err);
+                document.getElementById('crypto-desc').innerText = "데이터를 불러오지 못했습니다.";
+            });
+
+        // 미국 및 한국 지수 (시뮬레이션 예시 데이터)
+        setTimeout(() => {
+            // 미국 증시
+            const usVal = 42; 
+            const usInfo = getActionStrategy(usVal);
+            usChart.setOption(getGaugeOption(usVal, usInfo.mainColor));
+            const usText = document.getElementById('us-text');
+            usText.innerText = `Fear (${usVal})`;
+            usText.style.color = usInfo.mainColor;
+            const usBadge = document.getElementById('us-badge');
+            usBadge.innerText = usInfo.badge;
+            usBadge.className = `text-xs font-bold px-2 py-0.5 rounded ${usInfo.badgeColor}`;
+            document.getElementById('us-desc').innerText = usInfo.desc;
+            document.getElementById('us-time').innerText = "2026-10-02 05:00 (전일 종가 기준)";
+
+            // 한국 증시
+            const krVal = 50; 
+            const krInfo = getActionStrategy(krVal);
+            krChart.setOption(getGaugeOption(krVal, krInfo.mainColor));
+            const krText = document.getElementById('kr-text');
+            krText.innerText = `Neutral (${krVal})`;
+            krText.style.color = krInfo.mainColor;
+            const krBadge = document.getElementById('kr-badge');
+            krBadge.innerText = krInfo.badge;
+            krBadge.className = `text-xs font-bold px-2 py-0.5 rounded ${krInfo.badgeColor}`;
+            document.getElementById('kr-desc').innerText = krInfo.desc;
+            document.getElementById('kr-time').innerText = "2026-10-02 15:30 (장 마감 기준)";
+        }, 300);
+
+        window.addEventListener('resize', () => {
+            cryptoChart.resize();
+            usChart.resize();
+            krChart.resize();
+        });
+    </script>
+</body>
+</html>
