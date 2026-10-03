@@ -80,7 +80,7 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">한국 증시 (KOR)</h2>
-                        <a href="https://kr.tradingview.com/symbols/KRX-VKOSPI/" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 hover:bg-blue-900 transition cursor-pointer">API: TradingView ↗</a>
+                        <a href="https://finance.yahoo.com/quote/%5EVKOSPI" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 hover:bg-blue-900 transition cursor-pointer">API: Yahoo Finance ↗</a>
                     </div>
                     <div id="kr-gauge" class="chart-container"></div>
                     <div class="text-center -mt-4 mb-4">
@@ -153,8 +153,25 @@
             document.getElementById(`${target}-time`).innerText = timeString;
         }
 
-        // 1. 코인 API (정상)
-        fetch('https://api.alternative.me/fng/?t=' + Date.now())
+        // 아이폰 자체에서 작동하는 강력한 우회 통신 함수 (Vercel IP 차단 무력화)
+        async function fetchSecureClient(targetUrl) {
+            try {
+                // 매번 새로운 시간 꼬리표를 달아 캐시(에러 기억) 완전 차단
+                const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl) + '&t=' + Date.now();
+                const res = await fetch(proxyUrl);
+                const data = await res.json();
+                if (data.contents) return JSON.parse(data.contents);
+                throw new Error("데이터 없음");
+            } catch (e) {
+                // 2차 백업망 (AllOrigins 실패 시)
+                const backupProxy = 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(targetUrl) + '&t=' + Date.now();
+                const res2 = await fetch(backupProxy);
+                return await res2.json();
+            }
+        }
+
+        // 1. 코인 API (직접 연결)
+        fetch('https://api.alternative.me/fng/?limit=1')
             .then(res => res.json())
             .then(data => {
                 const value = parseInt(data.data[0].value);
@@ -165,12 +182,9 @@
                 document.getElementById('crypto-text').innerText = "오류 발생";
             });
 
-        // 2. 미국 증시 API (현재 잘 작동하고 있는 백엔드 유지)
-        fetch('/api/proxy?target=cnn&t=' + Date.now())
-            .then(res => {
-                if (!res.ok) throw new Error('백엔드 서버 에러');
-                return res.json();
-            })
+        // 2. 미국 증시 API (클라이언트 다이렉트 통신)
+        const cnnUrl = 'https://production.dataviz.cnn.io/index/fearandgreed/graphdata';
+        fetchSecureClient(cnnUrl)
             .then(data => {
                 const value = Math.round(data.fear_and_greed.score);
                 const time = new Date(data.fear_and_greed.timestamp).toLocaleString('ko-KR', { hour12: false });
@@ -182,23 +196,20 @@
                 document.getElementById('us-desc').innerText = "미국 증시 데이터를 가져오지 못했습니다.";
             });
 
-        // 3. 한국 증시 API (브라우저 보안을 피해 완성된 통합 백엔드 호출)
-        fetch('/api/proxy?target=kr&t=' + Date.now())
-            .then(res => {
-                if (!res.ok) throw new Error('백엔드 통신 에러');
-                return res.json();
-            })
+        // 3. 한국 증시 API (야후 파이낸스 클라이언트 다이렉트 통신)
+        const yahooUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/^VKOSPI';
+        fetchSecureClient(yahooUrl)
             .then(data => {
-                const vkospi = data.vkospi;
+                const vkospi = data.chart.result[0].meta.regularMarketPrice;
+                const timestamp = data.chart.result[0].meta.regularMarketTime;
                 
                 // VKOSPI -> 공포탐욕점수 변환
                 let value = Math.round(100 - ((vkospi - 12) * 4)); 
                 if (value > 100) value = 100;
                 if (value < 0) value = 0;
 
-                const time = new Date().toLocaleString('ko-KR', { hour12: false });
+                const time = new Date(timestamp * 1000).toLocaleString('ko-KR', { hour12: false });
                 const customDesc = `(현재 실시간 한국 VKOSPI 지수: ${vkospi})\n` + getActionStrategy(value).desc;
-                
                 updateDashboard('kr', value, time, customDesc);
             })
             .catch(err => {
