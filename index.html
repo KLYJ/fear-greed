@@ -77,8 +77,8 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">한국 증시 (KOR)</h2>
-                        <!-- 네이버 증권 링크로 교체 -->
-                        <a href="https://finance.naver.com/sise/sise_index.naver?code=VPI200" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 hover:bg-blue-900 transition cursor-pointer">API: Naver Finance ↗</a>
+                        <!-- 구글 파이낸스 링크로 교체 -->
+                        <a href="https://www.google.com/finance/quote/VKOSPI:KRX" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 hover:bg-blue-900 transition cursor-pointer">API: Google Finance ↗</a>
                     </div>
                     <div id="kr-gauge" class="chart-container"></div>
                     <div class="text-center -mt-4 mb-4">
@@ -161,15 +161,11 @@
             })
             .catch(err => {
                 document.getElementById('crypto-text').innerText = "오류 발생";
-                document.getElementById('crypto-desc').innerText = "데이터를 불러오지 못했습니다.";
             });
 
-        // 2. 미국 증시 API (내 백엔드)
-        fetch('/api/proxy?target=cnn')
-            .then(res => {
-                if (!res.ok) throw new Error('백엔드 서버 에러');
-                return res.json();
-            })
+        // 2. 미국 증시 API (사파리 캐시 무력화 꼬리표 추가: &t=시간)
+        fetch('/api/proxy?target=cnn&t=' + Date.now())
+            .then(res => res.json())
             .then(data => {
                 const value = Math.round(data.fear_and_greed.score);
                 const time = new Date(data.fear_and_greed.timestamp).toLocaleString('ko-KR', { hour12: false });
@@ -178,33 +174,31 @@
             .catch(err => {
                 document.getElementById('us-text').innerText = "오류 발생";
                 document.getElementById('us-text').style.color = "#ef4444";
-                document.getElementById('us-desc').innerText = "CNN 데이터를 가져오는 데 실패했습니다.";
             });
 
-        // 3. 한국 증시 API (야후 대신 네이버 증권으로 타겟 변경)
-        fetch('/api/proxy?target=naver')
+        // 3. 한국 증시 API (사파리 캐시 무력화 꼬리표 추가 및 타겟 변경)
+        fetch('/api/proxy?target=korea&t=' + Date.now())
             .then(res => {
-                if (!res.ok) throw new Error('백엔드 서버 에러');
+                if (!res.ok) throw new Error('서버 에러');
                 return res.json();
             })
             .then(data => {
                 const vkospi = data.vkospi;
-                const timestamp = data.timestamp;
                 
-                // 네이버 VKOSPI 지수를 공포탐욕점수(0~100)로 변환
+                // VKOSPI -> 공포탐욕지수 변환
                 let value = 100 - ((vkospi - 10) * 4); 
                 if (value > 100) value = 100;
                 if (value < 0) value = 0;
                 value = Math.round(value);
 
-                const time = new Date(timestamp).toLocaleString('ko-KR', { hour12: false });
+                const time = new Date(data.timestamp).toLocaleString('ko-KR', { hour12: false });
                 const customDesc = `(현재 실시간 VKOSPI 지수: ${vkospi})\n` + getActionStrategy(value).desc;
                 updateDashboard('kr', value, time, customDesc);
             })
             .catch(err => {
                 document.getElementById('kr-text').innerText = "오류 발생";
                 document.getElementById('kr-text').style.color = "#ef4444";
-                document.getElementById('kr-desc').innerText = "네이버 증권 데이터를 가져오는 데 실패했습니다.";
+                document.getElementById('kr-desc').innerText = "데이터를 가져오는 데 실패했습니다.";
             });
 
         window.addEventListener('resize', () => { cryptoChart.resize(); usChart.resize(); krChart.resize(); });
