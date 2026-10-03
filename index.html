@@ -27,7 +27,6 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">암호화폐 (Crypto)</h2>
-                        <!-- 클릭 가능한 원본 사이트 링크 -->
                         <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 hover:bg-blue-900 transition cursor-pointer">API: Alternative.me ↗</a>
                     </div>
                     <div id="crypto-gauge" class="chart-container"></div>
@@ -53,7 +52,6 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">미국 증시 (US)</h2>
-                        <!-- 클릭 가능한 원본 사이트 링크 -->
                         <a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 hover:bg-blue-900 transition cursor-pointer">API: CNN Business ↗</a>
                     </div>
                     <div id="us-gauge" class="chart-container"></div>
@@ -79,8 +77,8 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">한국 증시 (KOR)</h2>
-                        <!-- 클릭 가능한 원본 사이트 링크 -->
-                        <a href="https://finance.yahoo.com/quote/%5EVKOSPI" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 hover:bg-blue-900 transition cursor-pointer">API: Yahoo Finance ↗</a>
+                        <!-- 네이버 증권 링크로 교체 -->
+                        <a href="https://finance.naver.com/sise/sise_index.naver?code=VPI200" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 hover:bg-blue-900 transition cursor-pointer">API: Naver Finance ↗</a>
                     </div>
                     <div id="kr-gauge" class="chart-container"></div>
                     <div class="text-center -mt-4 mb-4">
@@ -153,7 +151,7 @@
             document.getElementById(`${target}-time`).innerText = timeString;
         }
 
-        // 1. 코인 API (직접 연결)
+        // 1. 코인 API
         fetch('https://api.alternative.me/fng/')
             .then(res => res.json())
             .then(data => {
@@ -166,7 +164,7 @@
                 document.getElementById('crypto-desc').innerText = "데이터를 불러오지 못했습니다.";
             });
 
-        // 2. 미국 증시 API (내 백엔드 서버 /api/proxy 경유)
+        // 2. 미국 증시 API (내 백엔드)
         fetch('/api/proxy?target=cnn')
             .then(res => {
                 if (!res.ok) throw new Error('백엔드 서버 에러');
@@ -183,31 +181,30 @@
                 document.getElementById('us-desc').innerText = "CNN 데이터를 가져오는 데 실패했습니다.";
             });
 
-        // 3. 한국 증시 API (내 백엔드 서버 /api/proxy 경유, 새 JSON 구조 파싱)
-        fetch('/api/proxy?target=yahoo')
+        // 3. 한국 증시 API (야후 대신 네이버 증권으로 타겟 변경)
+        fetch('/api/proxy?target=naver')
             .then(res => {
                 if (!res.ok) throw new Error('백엔드 서버 에러');
                 return res.json();
             })
             .then(data => {
-                // v7 Quote API 구조에 맞춘 파싱
-                const result = data.quoteResponse.result[0];
-                const vkospi = result.regularMarketPrice;
-                const timestamp = result.regularMarketTime;
+                const vkospi = data.vkospi;
+                const timestamp = data.timestamp;
                 
+                // 네이버 VKOSPI 지수를 공포탐욕점수(0~100)로 변환
                 let value = 100 - ((vkospi - 10) * 4); 
                 if (value > 100) value = 100;
                 if (value < 0) value = 0;
                 value = Math.round(value);
 
-                const time = new Date(timestamp * 1000).toLocaleString('ko-KR', { hour12: false });
+                const time = new Date(timestamp).toLocaleString('ko-KR', { hour12: false });
                 const customDesc = `(현재 실시간 VKOSPI 지수: ${vkospi})\n` + getActionStrategy(value).desc;
                 updateDashboard('kr', value, time, customDesc);
             })
             .catch(err => {
                 document.getElementById('kr-text').innerText = "오류 발생";
                 document.getElementById('kr-text').style.color = "#ef4444";
-                document.getElementById('kr-desc').innerText = "야후 파이낸스 데이터를 가져오는 데 실패했습니다.";
+                document.getElementById('kr-desc').innerText = "네이버 증권 데이터를 가져오는 데 실패했습니다.";
             });
 
         window.addEventListener('resize', () => { cryptoChart.resize(); usChart.resize(); krChart.resize(); });
