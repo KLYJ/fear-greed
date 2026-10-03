@@ -100,7 +100,6 @@
     </div>
 
     <script>
-        // 현재 시간 타이머
         function updateClock() {
             const now = new Date();
             document.getElementById('current-clock').innerText = `현재 조회 일시: ${now.toLocaleString('ko-KR', { hour12: false })} KST`;
@@ -108,7 +107,6 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // 행동 가이드 산출 함수
         function getActionStrategy(value) {
             if (value <= 25) return { state: 'Extreme Fear', badge: '적극 분할 매수 고려', badgeColor: 'bg-emerald-950 text-emerald-400', mainColor: '#10b981', desc: '과매도 국면입니다. 패닉 셀에 동참하기보다 우량 자산을 중심으로 분할 매수를 검토하기 유리한 구간입니다.' };
             if (value <= 45) return { state: 'Fear', badge: '관망 및 저점 분할 매수', badgeColor: 'bg-teal-950 text-teal-400', mainColor: '#14b8a6', desc: '시장 침체 국면입니다. 무리한 진입보다는 관심 종목의 지지선을 확인하며 보수적으로 분할 매수할 타이밍입니다.' };
@@ -117,7 +115,6 @@
             return { state: 'Extreme Greed', badge: '분할 매도 및 현금 확보', badgeColor: 'bg-rose-950 text-rose-400', mainColor: '#f43f5e', desc: '단기 과열 국면입니다. 하락 조정에 취약하므로 적극적인 분할 매도로 현금 비중을 높이는 것이 안전합니다.' };
         }
 
-        // 차트 그리기 옵션
         function getGaugeOption(value, color) {
             return {
                 series: [{
@@ -131,12 +128,10 @@
             };
         }
 
-        // 차트 초기화
         const cryptoChart = echarts.init(document.getElementById('crypto-gauge'));
         const usChart = echarts.init(document.getElementById('us-gauge'));
         const krChart = echarts.init(document.getElementById('kr-gauge'));
 
-        // 공통 UI 업데이트 함수
         function updateDashboard(target, value, timeString, customDesc = null) {
             const info = getActionStrategy(value);
             const chart = target === 'crypto' ? cryptoChart : (target === 'us' ? usChart : krChart);
@@ -155,37 +150,48 @@
             document.getElementById(`${target}-time`).innerText = timeString;
         }
 
-        // 1. 코인 API (Alternative.me)
+        // 1. 코인 API (정상 작동)
         fetch('https://api.alternative.me/fng/')
             .then(res => res.json())
             .then(data => {
                 const value = parseInt(data.data[0].value);
                 const time = new Date(parseInt(data.data[0].timestamp) * 1000).toLocaleString('ko-KR', { hour12: false });
                 updateDashboard('crypto', value, time);
+            })
+            .catch(err => {
+                document.getElementById('crypto-text').innerText = "오류 발생";
+                document.getElementById('crypto-desc').innerText = "데이터를 불러오지 못했습니다.";
             });
 
-        // 2. 미국 증시 API (CNN 실시간 데이터 - 우회 호출)
+        // 2. 미국 증시 API (직접 우회 호출 및 에러 처리)
         const cnnUrl = 'https://production.dataviz.cnn.io/index/fearandgreed/graphdata';
-        fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(cnnUrl)}`)
-            .then(res => res.json())
+        fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(cnnUrl)}`)
+            .then(res => {
+                if (!res.ok) throw new Error('CNN 서버가 프록시 접근을 차단했습니다.');
+                return res.json();
+            })
             .then(data => {
-                const parsed = JSON.parse(data.contents);
-                const value = Math.round(parsed.fear_and_greed.score);
-                const time = new Date(parsed.fear_and_greed.timestamp).toLocaleString('ko-KR', { hour12: false });
+                const value = Math.round(data.fear_and_greed.score);
+                const time = new Date(data.fear_and_greed.timestamp).toLocaleString('ko-KR', { hour12: false });
                 updateDashboard('us', value, time);
+            })
+            .catch(err => {
+                document.getElementById('us-text').innerText = "호출 차단됨";
+                document.getElementById('us-text').style.color = "#ef4444";
+                document.getElementById('us-desc').innerText = "CNN 서버 보안 정책으로 인해 브라우저에서 직접 실시간 데이터를 가져오지 못했습니다.";
             });
 
-        // 3. 한국 증시 API (야후 파이낸스 VKOSPI 실시간 데이터 - 우회 호출 및 역산)
+        // 3. 한국 증시 API (직접 우회 호출 및 에러 처리)
         const yahooUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/^VKOSPI';
-        fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(yahooUrl)}`)
-            .then(res => res.json())
+        fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`)
+            .then(res => {
+                if (!res.ok) throw new Error('야후 파이낸스 접근 실패');
+                return res.json();
+            })
             .then(data => {
-                const parsed = JSON.parse(data.contents);
-                const vkospi = parsed.chart.result[0].meta.regularMarketPrice;
-                const timestamp = parsed.chart.result[0].meta.regularMarketTime;
+                const vkospi = data.chart.result[0].meta.regularMarketPrice;
+                const timestamp = data.chart.result[0].meta.regularMarketTime;
                 
-                // VKOSPI(변동성 지수)를 공포탐욕점수(0~100)로 변환하는 자체 공식
-                // 변동성이 높을수록(주가 급락) 공포 점수가 낮아지도록 설정
                 let value = 100 - ((vkospi - 10) * 4); 
                 if (value > 100) value = 100;
                 if (value < 0) value = 0;
@@ -194,10 +200,15 @@
                 const time = new Date(timestamp * 1000).toLocaleString('ko-KR', { hour12: false });
                 const customDesc = `(현재 실시간 VKOSPI 지수: ${vkospi})\n` + getActionStrategy(value).desc;
                 updateDashboard('kr', value, time, customDesc);
+            })
+            .catch(err => {
+                document.getElementById('kr-text').innerText = "호출 차단됨";
+                document.getElementById('kr-text').style.color = "#ef4444";
+                document.getElementById('kr-desc').innerText = "야후 파이낸스 서버 응답이 없거나 데이터 갱신이 지연되고 있습니다.";
             });
 
-        // 반응형 리사이징
         window.addEventListener('resize', () => { cryptoChart.resize(); usChart.resize(); krChart.resize(); });
     </script>
+
 </body>
 </html>
