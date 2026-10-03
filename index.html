@@ -9,14 +9,14 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <style>
         body { background-color: #0f172a; color: #f8fafc; }
-        .chart-container { width: 100%; height: 260px; }
+        .chart-container { width: 100%; height: 220px; }
     </style>
 </head>
 <body class="p-4 md:p-8 font-sans">
     <div class="max-w-6xl mx-auto">
         <header class="mb-8 text-center">
             <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-2">Fear & Greed Index</h1>
-            <p class="text-sm text-slate-400">코인·미국·한국 100% 실시간 API 연동 대시보드</p>
+            <p class="text-sm text-slate-400">코인·미국·한국 주요 지수 실시간 연동 대시보드</p>
             <div id="current-clock" class="inline-block mt-3 px-3 py-1 bg-slate-800 rounded-full text-xs text-slate-300 border border-slate-700">조회 일시: 계산 중...</div>
         </header>
 
@@ -26,10 +26,15 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">암호화폐 (Crypto)</h2>
-                        <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">API: Alternative.me ↗</a>
+                        <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">Alternative.me ↗</a>
+                    </div>
+                    <!-- 비트코인 실시간 시세 박스 -->
+                    <div id="crypto-sub-info" class="bg-slate-900/60 rounded-lg p-2.5 mb-2 text-xs flex justify-between items-center border border-slate-700/50">
+                        <span class="text-slate-400">비트코인(BTC)</span>
+                        <span id="btc-info" class="font-bold text-slate-200">불러오는 중...</span>
                     </div>
                     <div id="crypto-gauge" class="chart-container"></div>
-                    <div class="text-center -mt-4 mb-4"><span id="crypto-text" class="text-xl font-bold tracking-wide">로딩 중...</span></div>
+                    <div class="text-center -mt-2 mb-2"><span id="crypto-text" class="text-xl font-bold tracking-wide">로딩 중...</span></div>
                 </div>
                 <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-700/80">
                     <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-400 font-medium">대응 전략</span><span id="crypto-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span></div>
@@ -43,10 +48,16 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">미국 증시 (US)</h2>
-                        <a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">API: CNN Business ↗</a>
+                        <a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">CNN Business ↗</a>
+                    </div>
+                    <!-- 미국 3대 지수 실시간 시세 박스 -->
+                    <div id="us-sub-info" class="bg-slate-900/60 rounded-lg p-2 mb-2 text-[11px] space-y-1 border border-slate-700/50">
+                        <div class="flex justify-between"><span class="text-slate-400">S&P 500</span><span id="sp500-info" class="font-bold text-slate-200">로딩 중...</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400">나스닥</span><span id="nasdaq-info" class="font-bold text-slate-200">로딩 중...</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400">다우존스</span><span id="dow-info" class="font-bold text-slate-200">로딩 중...</span></div>
                     </div>
                     <div id="us-gauge" class="chart-container"></div>
-                    <div class="text-center -mt-4 mb-4"><span id="us-text" class="text-xl font-bold tracking-wide">로딩 중...</span></div>
+                    <div class="text-center -mt-2 mb-2"><span id="us-text" class="text-xl font-bold tracking-wide">로딩 중...</span></div>
                 </div>
                 <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-700/80">
                     <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-400 font-medium">대응 전략</span><span id="us-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span></div>
@@ -60,10 +71,15 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">한국 증시 (KOR)</h2>
-                        <a href="https://finance.yahoo.com/quote/%5EKS11" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">API: Yahoo KOSPI ↗</a>
+                        <a href="https://finance.yahoo.com/quote/%5EKS11" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">Yahoo KOSPI ↗</a>
+                    </div>
+                    <!-- 코스피 실시간 시세 박스 -->
+                    <div id="kr-sub-info" class="bg-slate-900/60 rounded-lg p-2.5 mb-2 text-xs flex justify-between items-center border border-slate-700/50">
+                        <span class="text-slate-400">코스피(KOSPI)</span>
+                        <span id="kospi-info" class="font-bold text-slate-200">불러오는 중...</span>
                     </div>
                     <div id="kr-gauge" class="chart-container"></div>
-                    <div class="text-center -mt-4 mb-4"><span id="kr-text" class="text-xl font-bold tracking-wide">로딩 중...</span></div>
+                    <div class="text-center -mt-2 mb-2"><span id="kr-text" class="text-xl font-bold tracking-wide">로딩 중...</span></div>
                 </div>
                 <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-700/80">
                     <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-400 font-medium">대응 전략</span><span id="kr-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span></div>
@@ -94,10 +110,10 @@
             return {
                 series: [{
                     type: 'gauge', startAngle: 190, endAngle: -10, min: 0, max: 100,
-                    itemStyle: { color: color }, progress: { show: true, width: 22, roundCap: true },
-                    pointer: { show: false }, axisLine: { lineStyle: { width: 22, color: [[1, '#1e293b']] } },
+                    itemStyle: { color: color }, progress: { show: true, width: 18, roundCap: true },
+                    pointer: { show: false }, axisLine: { lineStyle: { width: 18, color: [[1, '#1e293b']] } },
                     axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false },
-                    detail: { valueAnimation: true, offsetCenter: [0, '-10%'], fontSize: 44, fontWeight: 'bold', color: '#f8fafc', formatter: '{value}' },
+                    detail: { valueAnimation: true, offsetCenter: [0, '-5%'], fontSize: 36, fontWeight: 'bold', color: '#f8fafc', formatter: '{value}' },
                     data: [{ value: value }]
                 }]
             };
@@ -125,30 +141,47 @@
             document.getElementById(`${target}-time`).innerText = timeString;
         }
 
-        // 1. 코인 API
-        fetch('https://api.alternative.me/fng/?t=' + Date.now())
+        function formatChange(val) {
+            const color = val >= 0 ? 'text-emerald-400' : 'text-rose-400';
+            const sign = val >= 0 ? '+' : '';
+            return `<span class="${color}">${sign}${val.toFixed(2)}%</span>`;
+        }
+
+        // 1. 암호화폐 API (공포지수 + 비트코인)
+        fetch('/api/proxy?target=crypto&t=' + Date.now())
             .then(res => res.json())
             .then(data => {
-                const value = parseInt(data.data[0].value);
-                const time = new Date(parseInt(data.data[0].timestamp) * 1000).toLocaleString('ko-KR', { hour12: false });
+                const value = parseInt(data.fng.value);
+                const time = new Date(parseInt(data.fng.timestamp) * 1000).toLocaleString('ko-KR', { hour12: false });
                 updateDashboard('crypto', value, time);
+
+                // 비트코인 정보 표시
+                const btcP = data.btcPrice.toLocaleString();
+                const btcC = data.btcChange;
+                document.getElementById('btc-info').innerHTML = `$${btcP} (${formatChange(btcC)})`;
             })
             .catch(err => { document.getElementById('crypto-text').innerText = "오류 발생"; });
 
-        // 2. 미국 증시 API (오타 수정 완료: fear_and_greed)
+        // 2. 미국 증시 API (CNN 공포지수 + 미국 3대 지수)
         fetch('/api/proxy?target=cnn&t=' + Date.now())
             .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
-                const value = Math.round(data.fear_and_greed.score);
-                const time = new Date(data.fear_and_greed.timestamp).toLocaleString('ko-KR', { hour12: false });
+                const value = Math.round(data.cnn.fear_and_greed.score);
+                const time = new Date(data.cnn.fear_and_greed.timestamp).toLocaleString('ko-KR', { hour12: false });
                 updateDashboard('us', value, time);
+
+                // 미국 3대 지수 표시
+                const us = data.usIndices;
+                document.getElementById('sp500-info').innerHTML = `${us.sp500.price.toLocaleString(undefined, {minimumFractionDigits: 2})} (${formatChange(us.sp500.change)})`;
+                document.getElementById('nasdaq-info').innerHTML = `${us.nasdaq.price.toLocaleString(undefined, {minimumFractionDigits: 2})} (${formatChange(us.nasdaq.change)})`;
+                document.getElementById('dow-info').innerHTML = `${us.dow.price.toLocaleString(undefined, {minimumFractionDigits: 2})} (${formatChange(us.dow.change)})`;
             })
             .catch(err => {
                 document.getElementById('us-text').innerText = "오류 발생";
                 document.getElementById('us-text').style.color = "#ef4444";
             });
 
-        // 3. 한국 증시 API (정상 작동 중인 KOSPI 백엔드 연동)
+        // 3. 한국 증시 API (코스피 현재가 및 등락률)
         fetch('/api/proxy?target=kr&t=' + Date.now())
             .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
@@ -160,9 +193,10 @@
                 if (value < 0) value = 0;
 
                 const time = new Date().toLocaleString('ko-KR', { hour12: false });
-                const customDesc = `(현재 코스피: ${kospi.toLocaleString()}, 등락: ${ratio >= 0 ? '+' : ''}${ratio.toFixed(2)}%)\n` + getActionStrategy(value).desc;
+                const customDesc = `(코스피: ${kospi.toLocaleString(undefined, {minimumFractionDigits: 2})}, 등락: ${ratio >= 0 ? '+' : ''}${ratio.toFixed(2)}%)\n` + getActionStrategy(value).desc;
                 
                 updateDashboard('kr', value, time, customDesc);
+                document.getElementById('kospi-info').innerHTML = `${kospi.toLocaleString(undefined, {minimumFractionDigits: 2})} (${formatChange(ratio)})`;
             })
             .catch(err => {
                 document.getElementById('kr-text').innerText = "오류 발생";
