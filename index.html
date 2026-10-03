@@ -60,7 +60,7 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">한국 증시 (KOR)</h2>
-                        <a href="https://kr.tradingview.com/symbols/KRX-VKOSPI/" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">API: TradingView ↗</a>
+                        <a href="https://finance.yahoo.com/quote/%5EVKOSPI" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">API: Yahoo Finance ↗</a>
                     </div>
                     <div id="kr-gauge" class="chart-container"></div>
                     <div class="text-center -mt-4 mb-4"><span id="kr-text" class="text-xl font-bold tracking-wide">로딩 중...</span></div>
@@ -125,7 +125,7 @@
             document.getElementById(`${target}-time`).innerText = timeString;
         }
 
-        // 1. 코인 API (직접 연결)
+        // 1. 코인 API
         fetch('https://api.alternative.me/fng/?t=' + Date.now())
             .then(res => res.json())
             .then(data => {
@@ -137,7 +137,7 @@
                 document.getElementById('crypto-text').innerText = "오류 발생";
             });
 
-        // 2. 미국 증시 API (복구된 백엔드 호출)
+        // 2. 미국 증시 API (엣지 서버 호출)
         fetch('/api/proxy?target=cnn&t=' + Date.now())
             .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
@@ -150,13 +150,11 @@
                 document.getElementById('us-text').style.color = "#ef4444";
             });
 
-        // 3. 한국 증시 API (트레이딩뷰 기반 백엔드 호출)
+        // 3. 한국 증시 API (구글 시트 폐기 / 엣지 서버 호출로 복귀)
         fetch('/api/proxy?target=kr&t=' + Date.now())
             .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
                 const vkospi = data.vkospi;
-                
-                // VKOSPI -> 공포탐욕점수 변환
                 let value = Math.round(100 - ((vkospi - 12) * 4)); 
                 if (value > 100) value = 100;
                 if (value < 0) value = 0;
