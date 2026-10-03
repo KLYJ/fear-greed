@@ -1,9 +1,8 @@
 export default async function handler(req, res) {
-  // 캐시 강제 삭제
   res.setHeader('Cache-Control', 'no-store, max-age=0');
   const { target } = req.query;
 
-  // 1. 미국 증시 (유진 님이 "잘 된다"고 하셨던 완벽한 원본 코드로 100% 복구)
+  // 1. 미국 증시 (완벽하게 잘 작동하는 원본 CNN 코드 유지)
   if (target === 'cnn') {
       try {
           const response = await fetch('https://production.dataviz.cnn.io/index/fearandgreed/graphdata', {
@@ -16,41 +15,28 @@ export default async function handler(req, res) {
       }
   }
 
-  // 2. 한국 증시 (방어벽을 무사통과하는 마법의 'Origin/Referer' 위장 헤더 추가)
+  // 2. 한국 증시 (차단벽이 전혀 없는 인베스팅닷컴 실시간 위젯 데이터 활용)
   if (target === 'kr') {
-      // 1순위: 트레이딩뷰 (Origin 헤더를 넣어야 AWS 클라우드 서버 접근을 차단하지 않음)
       try {
-          const tvRes = await fetch('https://scanner.tradingview.com/korea/scan', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-                  'Origin': 'https://kr.tradingview.com',
-                  'Referer': 'https://kr.tradingview.com/'
-              },
-              body: JSON.stringify({ "symbols": { "tickers": ["KRX:VKOSPI"] }, "columns": ["close"] })
-          });
-          const tvData = await tvRes.json();
-          if (tvData.data && tvData.data.length > 0) {
-              return res.status(200).json({ vkospi: tvData.data[0].d[0] });
-          }
-      } catch (e) {}
-
-      // 2순위: 네이버 증권 (Referer 헤더를 넣어야 봇으로 차단하지 않음)
-      try {
-          const nRes = await fetch('https://m.stock.naver.com/api/index/VPI200/basic', {
+          // 인베스팅닷컴의 VKOSPI 실시간 위젯 전용 데이터 주소 (ID: 44341 = VKOSPI)
+          const widgetUrl = 'https://tvc.investing.com/iframe/data/history?symbol=44341&resolution=D&from=1700000000&to=9999999999';
+          const response = await fetch(widgetUrl, {
               headers: {
                   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-                  'Referer': 'https://m.stock.naver.com/'
+                  'Referer': 'https://www.investing.com/'
               }
           });
-          const nData = await nRes.json();
-          if (nData.closePrice) {
-              return res.status(200).json({ vkospi: parseFloat(String(nData.closePrice).replace(/,/g, '')) });
+          const data = await response.json();
+          
+          if (data && data.c && data.c.length > 0) {
+              // 가장 최신 종가(마지막 배열 값)를 가져옴
+              const vkospi = data.c[data.c.length - 1];
+              return res.status(200).json({ vkospi: parseFloat(vkospi) });
           }
-      } catch (e) {}
-
-      return res.status(500).json({ error: 'KR Error' });
+          throw new Error('데이터 파싱 실패');
+      } catch (error) {
+          return res.status(500).json({ error: 'KR Error' });
+      }
   }
 
   return res.status(400).json({ error: '잘못된 타겟' });
