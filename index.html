@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>글로벌 실시간 공포·탐욕 지수 대시보드</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
@@ -19,9 +17,7 @@
         <header class="mb-8 text-center">
             <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-2">Fear & Greed Index</h1>
             <p class="text-sm text-slate-400">코인·미국·한국 100% 실시간 API 연동 대시보드</p>
-            <div id="current-clock" class="inline-block mt-3 px-3 py-1 bg-slate-800 rounded-full text-xs text-slate-300 border border-slate-700">
-                조회 일시: 계산 중...
-            </div>
+            <div id="current-clock" class="inline-block mt-3 px-3 py-1 bg-slate-800 rounded-full text-xs text-slate-300 border border-slate-700">조회 일시: 계산 중...</div>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -30,23 +26,15 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">암호화폐 (Crypto)</h2>
-                        <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 hover:bg-blue-900 transition cursor-pointer">API: Alternative.me ↗</a>
+                        <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">API: Alternative.me ↗</a>
                     </div>
                     <div id="crypto-gauge" class="chart-container"></div>
-                    <div class="text-center -mt-4 mb-4">
-                        <span id="crypto-text" class="text-xl font-bold tracking-wide">로딩 중...</span>
-                    </div>
+                    <div class="text-center -mt-4 mb-4"><span id="crypto-text" class="text-xl font-bold tracking-wide">로딩 중...</span></div>
                 </div>
                 <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-700/80">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs text-slate-400 font-medium">대응 전략</span>
-                        <span id="crypto-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span>
-                    </div>
+                    <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-400 font-medium">대응 전략</span><span id="crypto-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span></div>
                     <p id="crypto-desc" class="text-xs text-slate-300 leading-relaxed mb-3">-</p>
-                    <p class="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
-                        <span>최종 갱신:</span>
-                        <span id="crypto-time" class="text-slate-300">-</span>
-                    </p>
+                    <p class="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between"><span>최종 갱신:</span><span id="crypto-time" class="text-slate-300">-</span></p>
                 </div>
             </div>
 
@@ -55,23 +43,15 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">미국 증시 (US)</h2>
-                        <a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 hover:bg-blue-900 transition cursor-pointer">API: CNN Business ↗</a>
+                        <a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">API: CNN Business ↗</a>
                     </div>
                     <div id="us-gauge" class="chart-container"></div>
-                    <div class="text-center -mt-4 mb-4">
-                        <span id="us-text" class="text-xl font-bold tracking-wide">로딩 중...</span>
-                    </div>
+                    <div class="text-center -mt-4 mb-4"><span id="us-text" class="text-xl font-bold tracking-wide">로딩 중...</span></div>
                 </div>
                 <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-700/80">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs text-slate-400 font-medium">대응 전략</span>
-                        <span id="us-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span>
-                    </div>
+                    <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-400 font-medium">대응 전략</span><span id="us-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span></div>
                     <p id="us-desc" class="text-xs text-slate-300 leading-relaxed mb-3">-</p>
-                    <p class="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
-                        <span>최종 갱신:</span>
-                        <span id="us-time" class="text-slate-300">-</span>
-                    </p>
+                    <p class="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between"><span>최종 갱신:</span><span id="us-time" class="text-slate-300">-</span></p>
                 </div>
             </div>
 
@@ -80,23 +60,15 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">한국 증시 (KOR)</h2>
-                        <a href="https://finance.yahoo.com/quote/%5EVKOSPI" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 hover:bg-blue-900 transition cursor-pointer">API: Yahoo Finance ↗</a>
+                        <a href="https://kr.tradingview.com/symbols/KRX-VKOSPI/" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">API: TradingView ↗</a>
                     </div>
                     <div id="kr-gauge" class="chart-container"></div>
-                    <div class="text-center -mt-4 mb-4">
-                        <span id="kr-text" class="text-xl font-bold tracking-wide">로딩 중...</span>
-                    </div>
+                    <div class="text-center -mt-4 mb-4"><span id="kr-text" class="text-xl font-bold tracking-wide">로딩 중...</span></div>
                 </div>
                 <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-700/80">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs text-slate-400 font-medium">대응 전략</span>
-                        <span id="kr-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span>
-                    </div>
+                    <div class="flex items-center justify-between mb-2"><span class="text-xs text-slate-400 font-medium">대응 전략</span><span id="kr-badge" class="text-xs font-bold px-2 py-0.5 rounded">-</span></div>
                     <p id="kr-desc" class="text-xs text-slate-300 leading-relaxed mb-3">-</p>
-                    <p class="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between">
-                        <span>최종 갱신:</span>
-                        <span id="kr-time" class="text-slate-300">-</span>
-                    </p>
+                    <p class="text-[11px] text-slate-400 border-t border-slate-800 pt-2 flex justify-between"><span>최종 갱신:</span><span id="kr-time" class="text-slate-300">-</span></p>
                 </div>
             </div>
         </div>
@@ -111,11 +83,11 @@
         updateClock();
 
         function getActionStrategy(value) {
-            if (value <= 25) return { state: 'Extreme Fear', badge: '적극 분할 매수 고려', badgeColor: 'bg-emerald-950 text-emerald-400', mainColor: '#10b981', desc: '과매도 국면입니다. 패닉 셀에 동참하기보다 우량 자산을 중심으로 분할 매수를 검토하기 유리한 구간입니다.' };
-            if (value <= 45) return { state: 'Fear', badge: '관망 및 저점 분할 매수', badgeColor: 'bg-teal-950 text-teal-400', mainColor: '#14b8a6', desc: '시장 침체 국면입니다. 무리한 진입보다는 관심 종목의 지지선을 확인하며 보수적으로 분할 매수할 타이밍입니다.' };
-            if (value <= 55) return { state: 'Neutral', badge: '보유 (Hold) 및 방향성 관망', badgeColor: 'bg-amber-950 text-amber-400', mainColor: '#f59e0b', desc: '매수세와 매도세가 팽팽합니다. 기존 보유 포지션을 유지하며 다음 변동성 방향을 확인하는 것이 권장됩니다.' };
+            if (value <= 25) return { state: 'Extreme Fear', badge: '적극 분할 매수 고려', badgeColor: 'bg-emerald-950 text-emerald-400', mainColor: '#10b981', desc: '과매도 국면입니다. 우량 자산을 중심으로 분할 매수를 검토하기 유리한 구간입니다.' };
+            if (value <= 45) return { state: 'Fear', badge: '관망 및 저점 분할 매수', badgeColor: 'bg-teal-950 text-teal-400', mainColor: '#14b8a6', desc: '시장 침체 국면입니다. 관심 종목의 지지선을 확인하며 보수적으로 분할 매수할 타이밍입니다.' };
+            if (value <= 55) return { state: 'Neutral', badge: '보유 (Hold) 및 방향성 관망', badgeColor: 'bg-amber-950 text-amber-400', mainColor: '#f59e0b', desc: '매수세와 매도세가 팽팽합니다. 기존 보유 포지션을 유지하며 방향을 확인하는 것이 권장됩니다.' };
             if (value <= 75) return { state: 'Greed', badge: '보유 (Hold) & 분할 차익실현', badgeColor: 'bg-orange-950 text-orange-400', mainColor: '#f97316', desc: '낙관론이 우세합니다. 신규 추격 매수는 자제하고, 일정 비율 분할 익절을 고려할 구간입니다.' };
-            return { state: 'Extreme Greed', badge: '분할 매도 및 현금 확보', badgeColor: 'bg-rose-950 text-rose-400', mainColor: '#f43f5e', desc: '단기 과열 국면입니다. 하락 조정에 취약하므로 적극적인 분할 매도로 현금 비중을 높이는 것이 안전합니다.' };
+            return { state: 'Extreme Greed', badge: '분할 매도 및 현금 확보', badgeColor: 'bg-rose-950 text-rose-400', mainColor: '#f43f5e', desc: '단기 과열 국면입니다. 하락 조정에 취약하므로 적극적인 분할 매도로 현금 비중을 높여야 합니다.' };
         }
 
         function getGaugeOption(value, color) {
@@ -153,25 +125,8 @@
             document.getElementById(`${target}-time`).innerText = timeString;
         }
 
-        // 아이폰 자체에서 작동하는 강력한 우회 통신 함수 (Vercel IP 차단 무력화)
-        async function fetchSecureClient(targetUrl) {
-            try {
-                // 매번 새로운 시간 꼬리표를 달아 캐시(에러 기억) 완전 차단
-                const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl) + '&t=' + Date.now();
-                const res = await fetch(proxyUrl);
-                const data = await res.json();
-                if (data.contents) return JSON.parse(data.contents);
-                throw new Error("데이터 없음");
-            } catch (e) {
-                // 2차 백업망 (AllOrigins 실패 시)
-                const backupProxy = 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(targetUrl) + '&t=' + Date.now();
-                const res2 = await fetch(backupProxy);
-                return await res2.json();
-            }
-        }
-
         // 1. 코인 API (직접 연결)
-        fetch('https://api.alternative.me/fng/?limit=1')
+        fetch('https://api.alternative.me/fng/?t=' + Date.now())
             .then(res => res.json())
             .then(data => {
                 const value = parseInt(data.data[0].value);
@@ -182,9 +137,9 @@
                 document.getElementById('crypto-text').innerText = "오류 발생";
             });
 
-        // 2. 미국 증시 API (클라이언트 다이렉트 통신)
-        const cnnUrl = 'https://production.dataviz.cnn.io/index/fearandgreed/graphdata';
-        fetchSecureClient(cnnUrl)
+        // 2. 미국 증시 API (복구된 백엔드 호출)
+        fetch('/api/proxy?target=cnn&t=' + Date.now())
+            .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
                 const value = Math.round(data.fear_and_greed.score);
                 const time = new Date(data.fear_and_greed.timestamp).toLocaleString('ko-KR', { hour12: false });
@@ -193,29 +148,27 @@
             .catch(err => {
                 document.getElementById('us-text').innerText = "오류 발생";
                 document.getElementById('us-text').style.color = "#ef4444";
-                document.getElementById('us-desc').innerText = "미국 증시 데이터를 가져오지 못했습니다.";
             });
 
-        // 3. 한국 증시 API (야후 파이낸스 클라이언트 다이렉트 통신)
-        const yahooUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/^VKOSPI';
-        fetchSecureClient(yahooUrl)
+        // 3. 한국 증시 API (트레이딩뷰 기반 백엔드 호출)
+        fetch('/api/proxy?target=kr&t=' + Date.now())
+            .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
-                const vkospi = data.chart.result[0].meta.regularMarketPrice;
-                const timestamp = data.chart.result[0].meta.regularMarketTime;
+                const vkospi = data.vkospi;
                 
                 // VKOSPI -> 공포탐욕점수 변환
                 let value = Math.round(100 - ((vkospi - 12) * 4)); 
                 if (value > 100) value = 100;
                 if (value < 0) value = 0;
 
-                const time = new Date(timestamp * 1000).toLocaleString('ko-KR', { hour12: false });
-                const customDesc = `(현재 실시간 한국 VKOSPI 지수: ${vkospi})\n` + getActionStrategy(value).desc;
+                const time = new Date().toLocaleString('ko-KR', { hour12: false });
+                const customDesc = `(현재 실시간 한국 VKOSPI 지수: ${vkospi.toFixed(2)})\n` + getActionStrategy(value).desc;
+                
                 updateDashboard('kr', value, time, customDesc);
             })
             .catch(err => {
                 document.getElementById('kr-text').innerText = "오류 발생";
                 document.getElementById('kr-text').style.color = "#ef4444";
-                document.getElementById('kr-desc').innerText = "한국 증시 데이터를 가져오지 못했습니다.";
             });
 
         window.addEventListener('resize', () => { cryptoChart.resize(); usChart.resize(); krChart.resize(); });
