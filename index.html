@@ -135,12 +135,12 @@
             })
             .catch(err => { document.getElementById('crypto-text').innerText = "오류 발생"; });
 
-        // 2. 미국 증시 API (백엔드 통신)
+        // 2. 미국 증시 API (오타 수정 완료: fear_and_greed)
         fetch('/api/proxy?target=cnn&t=' + Date.now())
             .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
-                const value = Math.round(data.fear_and_greend.score);
-                const time = new Date(data.fear_and_greend.timestamp).toLocaleString('ko-KR', { hour12: false });
+                const value = Math.round(data.fear_and_greed.score);
+                const time = new Date(data.fear_and_greed.timestamp).toLocaleString('ko-KR', { hour12: false });
                 updateDashboard('us', value, time);
             })
             .catch(err => {
@@ -148,14 +148,13 @@
                 document.getElementById('us-text').style.color = "#ef4444";
             });
 
-        // 3. 한국 증시 API (지연 없는 백엔드 코스피 데이터 호출)
+        // 3. 한국 증시 API (정상 작동 중인 KOSPI 백엔드 연동)
         fetch('/api/proxy?target=kr&t=' + Date.now())
             .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
                 const kospi = data.kospi;
-                const ratio = data.ratio; // 등락률(%)
+                const ratio = data.ratio;
                 
-                // 코스피 등락률(-2% ~ +2%)을 공포탐욕점수(0~100)로 변환
                 let value = Math.round(50 + (ratio * 15));
                 if (value > 100) value = 100;
                 if (value < 0) value = 0;
