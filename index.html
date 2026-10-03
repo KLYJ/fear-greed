@@ -150,7 +150,7 @@
             document.getElementById(`${target}-time`).innerText = timeString;
         }
 
-        // 1. 코인 API (정상 작동)
+        // 1. 코인 API (직접 연결)
         fetch('https://api.alternative.me/fng/')
             .then(res => res.json())
             .then(data => {
@@ -163,11 +163,10 @@
                 document.getElementById('crypto-desc').innerText = "데이터를 불러오지 못했습니다.";
             });
 
-        // 2. 미국 증시 API (직접 우회 호출 및 에러 처리)
-        const cnnUrl = 'https://production.dataviz.cnn.io/index/fearandgreed/graphdata';
-        fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(cnnUrl)}`)
+        // 2. 미국 증시 API (내 백엔드 서버 /api/proxy 경유)
+        fetch('/api/proxy?target=cnn')
             .then(res => {
-                if (!res.ok) throw new Error('CNN 서버가 프록시 접근을 차단했습니다.');
+                if (!res.ok) throw new Error('백엔드 서버 에러');
                 return res.json();
             })
             .then(data => {
@@ -176,16 +175,15 @@
                 updateDashboard('us', value, time);
             })
             .catch(err => {
-                document.getElementById('us-text').innerText = "호출 차단됨";
+                document.getElementById('us-text').innerText = "오류 발생";
                 document.getElementById('us-text').style.color = "#ef4444";
-                document.getElementById('us-desc').innerText = "CNN 서버 보안 정책으로 인해 브라우저에서 직접 실시간 데이터를 가져오지 못했습니다.";
+                document.getElementById('us-desc').innerText = "CNN 데이터를 가져오는 데 실패했습니다.";
             });
 
-        // 3. 한국 증시 API (직접 우회 호출 및 에러 처리)
-        const yahooUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/^VKOSPI';
-        fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`)
+        // 3. 한국 증시 API (내 백엔드 서버 /api/proxy 경유)
+        fetch('/api/proxy?target=yahoo')
             .then(res => {
-                if (!res.ok) throw new Error('야후 파이낸스 접근 실패');
+                if (!res.ok) throw new Error('백엔드 서버 에러');
                 return res.json();
             })
             .then(data => {
@@ -202,13 +200,14 @@
                 updateDashboard('kr', value, time, customDesc);
             })
             .catch(err => {
-                document.getElementById('kr-text').innerText = "호출 차단됨";
+                document.getElementById('kr-text').innerText = "오류 발생";
                 document.getElementById('kr-text').style.color = "#ef4444";
-                document.getElementById('kr-desc').innerText = "야후 파이낸스 서버 응답이 없거나 데이터 갱신이 지연되고 있습니다.";
+                document.getElementById('kr-desc').innerText = "야후 파이낸스 데이터를 가져오는 데 실패했습니다.";
             });
 
         window.addEventListener('resize', () => { cryptoChart.resize(); usChart.resize(); krChart.resize(); });
     </script>
+
 
 </body>
 </html>
