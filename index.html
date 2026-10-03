@@ -60,7 +60,7 @@
                 <div>
                     <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-2">
                         <h2 class="text-lg font-bold text-white">한국 증시 (KOR)</h2>
-                        <a href="https://m.stock.naver.com/marketindex/index/KOSPI" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">API: Naver Direct ↗</a>
+                        <a href="https://finance.yahoo.com/quote/%5EKS11" target="_blank" class="text-[11px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">API: Yahoo KOSPI ↗</a>
                     </div>
                     <div id="kr-gauge" class="chart-container"></div>
                     <div class="text-center -mt-4 mb-4"><span id="kr-text" class="text-xl font-bold tracking-wide">로딩 중...</span></div>
@@ -139,8 +139,8 @@
         fetch('/api/proxy?target=cnn&t=' + Date.now())
             .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
-                const value = Math.round(data.fear_and_greed.score);
-                const time = new Date(data.fear_and_greed.timestamp).toLocaleString('ko-KR', { hour12: false });
+                const value = Math.round(data.fear_and_greend.score);
+                const time = new Date(data.fear_and_greend.timestamp).toLocaleString('ko-KR', { hour12: false });
                 updateDashboard('us', value, time);
             })
             .catch(err => {
@@ -148,23 +148,20 @@
                 document.getElementById('us-text').style.color = "#ef4444";
             });
 
-        // 3. 한국 증시 API (서버 거치지 않고 아이폰 브라우저에서 우회 프록시를 통해 네이버 코스피 직접 타격)
-        const naverApi = 'https://m.stock.naver.com/api/index/KOSPI/basic';
-        const directProxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(naverApi) + '&t=' + Date.now();
-
-        fetch(directProxy)
-            .then(res => res.json())
+        // 3. 한국 증시 API (지연 없는 백엔드 코스피 데이터 호출)
+        fetch('/api/proxy?target=kr&t=' + Date.now())
+            .then(res => { if (!res.ok) throw new Error(); return res.json(); })
             .then(data => {
-                const parsed = JSON.parse(data.contents);
-                const ratio = parseFloat(parsed.fluctuationsRatio); // 코스피 당일 등락률
+                const kospi = data.kospi;
+                const ratio = data.ratio; // 등락률(%)
                 
-                // 등락률을 기반으로 한 0~100 점수 변환
+                // 코스피 등락률(-2% ~ +2%)을 공포탐욕점수(0~100)로 변환
                 let value = Math.round(50 + (ratio * 15));
                 if (value > 100) value = 100;
                 if (value < 0) value = 0;
 
                 const time = new Date().toLocaleString('ko-KR', { hour12: false });
-                const customDesc = `(현재 코스피 지수: ${parsed.closePrice}, 등락: ${ratio}%)\n` + getActionStrategy(value).desc;
+                const customDesc = `(현재 코스피: ${kospi.toLocaleString()}, 등락: ${ratio >= 0 ? '+' : ''}${ratio.toFixed(2)}%)\n` + getActionStrategy(value).desc;
                 
                 updateDashboard('kr', value, time, customDesc);
             })
