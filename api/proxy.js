@@ -12,21 +12,18 @@ export default async function handler(req, res) {
         return res.status(200).json(data);
     }
 
-    // 2. 한국 증시 (네이버 증권 VKOSPI 직접 추출 방식)
+    // 2. 한국 증시 (네이버 모바일 숨겨진 실시간 API 활용 - 매우 안정적)
     if (target === 'naver') {
-        const url = 'https://finance.naver.com/sise/sise_index.naver?code=VPI200';
-        const response = await fetch(url, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
-        });
-        const html = await response.text();
+        const url = 'https://polling.finance.naver.com/api/realtime/domestic/index/VPI200';
+        const response = await fetch(url);
+        const data = await response.json();
         
-        // 네이버 증권 HTML 구조에서 현재 지수 숫자만 추출해 내는 정규식
-        const match = html.match(/id="now_value"[^>]*>([\d\.]+)</);
-        if (match && match[1]) {
-            const vkospi = parseFloat(match[1]);
+        // API에서 깔끔하게 숫자만 바로 뽑아옵니다.
+        if (data && data.datas && data.datas.length > 0) {
+            const vkospi = parseFloat(data.datas[0].closePrice.replace(/,/g, ''));
             return res.status(200).json({ vkospi: vkospi, timestamp: Date.now() });
         } else {
-            throw new Error('네이버 증권 데이터 추출 실패');
+            throw new Error('네이버 API 응답 오류');
         }
     }
 
